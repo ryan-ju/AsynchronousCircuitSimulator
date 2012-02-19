@@ -8,8 +8,8 @@ import java.io.Serializable;
  */
 public interface Executor extends Serializable{
 	public Executor getInstance();
-	public void execute(RedoableCommand cmd);
-	public void execute(UnredoableCommand cmd);
+	public void execute(UndoableCommand cmd);
+	public void execute(DoOnceCommand cmd);
 	public boolean canUndo();
 	public boolean canRedo();
 	public void undo();

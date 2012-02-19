@@ -55,7 +55,13 @@ public class AndGate extends Element<AndGate>{
 	}
 
 	@Override
-	public AndGate clone() {
+	public AndGate copy() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public GroupElement getParent() {
 		// TODO Auto-generated method stub
 		return null;
 	}

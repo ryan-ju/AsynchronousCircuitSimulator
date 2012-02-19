@@ -70,7 +70,13 @@ public class MajorityGate extends Element<MajorityGate> {
 	}
 
 	@Override
-	public MajorityGate clone() {
+	public MajorityGate copy() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public GroupElement getParent() {
 		// TODO Auto-generated method stub
 		return null;
 	}

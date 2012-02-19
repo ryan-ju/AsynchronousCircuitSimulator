@@ -52,7 +52,12 @@ public class Output extends Element<Output>{
 		
 	}
 	@Override
-	public Output clone() {
+	public Output copy() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public GroupElement getParent() {
 		// TODO Auto-generated method stub
 		return null;
 	}

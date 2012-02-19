@@ -54,7 +54,13 @@ public class NotGate extends Element<NotGate>{
 	}
 
 	@Override
-	public NotGate clone() {
+	public NotGate copy() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public GroupElement getParent() {
 		// TODO Auto-generated method stub
 		return null;
 	}

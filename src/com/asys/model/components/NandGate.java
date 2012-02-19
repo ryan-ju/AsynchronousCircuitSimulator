@@ -56,7 +56,13 @@ public class NandGate extends Element<NandGate>{
 	}
 
 	@Override
-	public NandGate clone() {
+	public NandGate copy() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public GroupElement getParent() {
 		// TODO Auto-generated method stub
 		return null;
 	}

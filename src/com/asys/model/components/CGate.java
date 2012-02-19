@@ -71,7 +71,13 @@ public class CGate extends Element<CGate>{
 	}
 
 	@Override
-	public CGate clone() {
+	public CGate copy() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public GroupElement getParent() {
 		// TODO Auto-generated method stub
 		return null;
 	}

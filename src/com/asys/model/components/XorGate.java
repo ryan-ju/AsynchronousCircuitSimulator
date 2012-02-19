@@ -49,7 +49,13 @@ public class XorGate extends Element<XorGate>{
 	}
 
 	@Override
-	public XorGate clone() {
+	public XorGate copy() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public GroupElement getParent() {
 		// TODO Auto-generated method stub
 		return null;
 	}

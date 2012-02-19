@@ -8,23 +8,21 @@ import java.io.Serializable;
 /**
  *
  */
-public class RoutingPoint implements Serializable {
-	private int x, y;
-
-	public int getX() {
-		return x;
-	}
-
-	protected void setX(int x) {
-		this.x = x;
-	}
-
-	public int getY() {
-		return y;
-	}
-
-	protected void setY(int y) {
-		this.y = y;
+public class RoutingPoint extends Point implements Serializable {
+	
+	public RoutingPoint(){
+		super();
 	}
 	
+	public RoutingPoint(int x, int y) {
+		super(x,y);
+	}
+
+	public RoutingPoint(Point p) {
+		super(p);
+	}
+	
+	public RoutingPoint copy(){
+		return new RoutingPoint(this);
+	}
 }

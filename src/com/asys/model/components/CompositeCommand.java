@@ -6,7 +6,7 @@ package com.asys.model.components;
 /**
  *
  */
-public class CompositeCommand implements RedoableCommand {
+public class CompositeCommand implements UndoableCommand {
 
 	/* (non-Javadoc)
 	 * @see com.asys.model.components.RedoableCommand#run()
@@ -17,13 +17,25 @@ public class CompositeCommand implements RedoableCommand {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see com.asys.model.components.RedoableCommand#undoAction()
-	 */
 	@Override
-	public void undoAction() {
+	public void cancel() {
 		// TODO Auto-generated method stub
 
 	}
+	
+	/* (non-Javadoc)
+	 * @see com.asys.model.components.RedoableCommand#undo()
+	 */
+	@Override
+	public void undo() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public void addCommand(UndoableCommand cmd){
+		// TODO
+	}
+
+	
 
 }

@@ -1,6 +1,5 @@
 package com.asys.model.components;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,19 +15,23 @@ import com.asys.model.components.exceptions.InvalidPropertyException;
 import com.asys.model.components.exceptions.InvalidPropertyKeyException;
 import com.asys.model.components.exceptions.MaxNumberOfPortsOutOfBoundException;
 import com.asys.model.components.exceptions.PortNumberOutOfBoundException;
+import com.asys.model.components.exceptions.ViolationException;
 
 /**
  *
  *
  */
-public abstract class Element<E extends Element> implements Serializable {
+public abstract class Element<E extends Element> implements Component {
 
 	private static final long serialVersionUID = 8399162215079949487L;
-	private int x, y, width, height, maxIP, maxOP;
+	private int x, y, x0, y0, width, height, maxIP, maxOP;
+	private boolean moveCommitted;
 	private Direction ort;
 	private Property prop;
 	private final List<Inport> ips;
 	private final List<Outport> ops;
+	private Executor ext;
+	private GroupElement parent;
 
 	// ====================================================
 	// Constructors
@@ -230,9 +233,9 @@ public abstract class Element<E extends Element> implements Serializable {
 	private void setMaximumNumberOfPorts(boolean isInport, int num) {
 		try {
 			if (isInport) {
-				this.setMaxNumberOfInport(num);
+				this.setMaxNumberOfInports(num);
 			} else {
-				this.setMaxNumberOfOutport(num);
+				this.setMaxNumberOfOutports(num);
 			}
 		} catch (MaxNumberOfPortsOutOfBoundException e) {
 			// Should not happen, since the method is only used for
@@ -278,6 +281,11 @@ public abstract class Element<E extends Element> implements Serializable {
 		this.y = y;
 	}
 
+	protected void setPosition(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+
 	public int getWidth() {
 		return width;
 	}
@@ -296,7 +304,7 @@ public abstract class Element<E extends Element> implements Serializable {
 
 	protected abstract void setOrientation(Direction ort);
 
-	abstract public E clone();
+	abstract public E copy();
 
 	public Property getProperty() {
 		return prop;
@@ -323,10 +331,11 @@ public abstract class Element<E extends Element> implements Serializable {
 		if (ips.contains(ip)) {
 			throw new DuplicatePortException(ip);
 		}
-		if (ips.size() < this.getMaxNumberOfInport()) {
+		if (ips.size() < this.getMaxNumberOfInports()) {
 			ips.add(ips.size() - 1, ip);
 		} else {
-			throw new PortNumberOutOfBoundException(this.getMaxNumberOfInport());
+			throw new PortNumberOutOfBoundException(
+					this.getMaxNumberOfInports());
 		}
 	}
 
@@ -362,7 +371,15 @@ public abstract class Element<E extends Element> implements Serializable {
 	 * 
 	 * @return
 	 */
-	public int getMaxNumberOfInport() {
+	public int getNumberOfInports() {
+		return ips.size();
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public int getMaxNumberOfInports() {
 		return maxIP;
 	}
 
@@ -372,7 +389,7 @@ public abstract class Element<E extends Element> implements Serializable {
 	 * @throws MaxNumberOfPortsOutOfBoundException
 	 *             When n is smaller than the current number of inports.
 	 */
-	protected void setMaxNumberOfInport(int n)
+	protected void setMaxNumberOfInports(int n)
 			throws MaxNumberOfPortsOutOfBoundException {
 		if (n < ips.size()) {
 			throw new MaxNumberOfPortsOutOfBoundException(ips.size());
@@ -396,11 +413,11 @@ public abstract class Element<E extends Element> implements Serializable {
 		if (ops.contains(op)) {
 			throw new DuplicatePortException(op);
 		}
-		if (ops.size() < this.getMaxNumberOfOutport()) {
+		if (ops.size() < this.getMaxNumberOfOutports()) {
 			ops.add(ops.size() - 1, op);
 		} else {
 			throw new PortNumberOutOfBoundException(
-					this.getMaxNumberOfOutport());
+					this.getMaxNumberOfOutports());
 		}
 	}
 
@@ -408,7 +425,7 @@ public abstract class Element<E extends Element> implements Serializable {
 	 * 
 	 * @return
 	 */
-	public List<Outport> getOurports() {
+	public List<Outport> getOutports() {
 		return ops;
 	}
 
@@ -426,7 +443,7 @@ public abstract class Element<E extends Element> implements Serializable {
 	 * 
 	 * @return true - if there were outports in the element.
 	 */
-	protected boolean removeAllOutport() {
+	protected boolean removeAllOutports() {
 		boolean b = ops.isEmpty();
 		ops.clear();
 		return b;
@@ -436,7 +453,7 @@ public abstract class Element<E extends Element> implements Serializable {
 	 * 
 	 * @return
 	 */
-	public int getumberOfOutport() {
+	public int getNumberOfOutports() {
 		return ops.size();
 	}
 
@@ -444,7 +461,7 @@ public abstract class Element<E extends Element> implements Serializable {
 	 * 
 	 * @return
 	 */
-	public int getMaxNumberOfOutport() {
+	public int getMaxNumberOfOutports() {
 		return maxOP;
 	}
 
@@ -454,12 +471,151 @@ public abstract class Element<E extends Element> implements Serializable {
 	 * @throws MaxNumberOfPortsOutOfBoundException
 	 *             When n is smaller than the current number of outports.
 	 */
-	protected void setMaxNumberOfOutport(int n)
+	protected void setMaxNumberOfOutports(int n)
 			throws MaxNumberOfPortsOutOfBoundException {
 		if (n < ops.size()) {
 			throw new MaxNumberOfPortsOutOfBoundException(ops.size());
 		}
 		maxOP = n;
+	}
+
+	// ====================================================
+	// Interface Component
+	// ====================================================
+
+	private ElementOverlappingDetector getEOD() {
+		return ComponentManager.getInstance();
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public void move(int dx, int dy) {
+		if (moveCommitted) { // If the previous move has been committed, i.e.,
+								// the current move is a new one.
+			x0 = x;
+			y0 = y;
+			moveCommitted = false;
+		}
+		setPosition(x0 + dx, y0 + dy);
+	}
+
+	/**
+	 * 
+	 */
+	public void cancelMove() {
+		setPosition(x0, y0);
+		moveCommitted = true;
+	}
+
+	/**
+	 * @throws ViolationException
+	 * 
+	 */
+	@Override
+	public UndoableCommand commitMove() throws ViolationException {
+		if (getEOD().overlap(this))
+			throw new ViolationException("Component overlapping!");
+
+		UndoableCommand cmd = new UndoableCommand() {
+			int x0_old, y0_old;
+
+			@Override
+			public void run() {
+				x0_old = Element.this.x0;
+				y0_old = Element.this.y0;
+				Element.this.x0 = x;
+				Element.this.y0 = y;
+				Element.this.moveCommitted = true;
+			}
+
+			@Override
+			public void cancel() {
+				Element.this.cancelMove();
+			}
+			
+			@Override
+			public void undo() {
+				Element.this.x = x0_old;
+				Element.this.y = y0_old;
+			}
+
+		};
+		return cmd;
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public Executor getExecutor() {
+		return ext;
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public void setExecutor(Executor executor) {
+		this.ext = executor;
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public GroupElement getParent() {
+		return parent;
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public void setParent(GroupElement ge) {
+		this.parent = ge;
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public boolean isInBound(int x, int y) {
+		boolean b = (x < getX()) || (x > (getX() + getWidth())) || (y < getY())
+				|| (y > (getY() + getHeight()));
+		return !b;
+	}
+
+	/**
+	 * @return true - the element lies completely in bound.
+	 */
+	@Override
+	public boolean isInBound(Rectangle bound) {
+		if (getWidth() > bound.getWidth() || getHeight() > bound.getHeight()) { // Not
+																				// in
+																				// bound
+			return false;
+		} else {
+			if (getX() >= bound.getX()
+					&& (getX() + getWidth()) <= (bound.getX() + bound
+							.getWidth())
+					&& getY() >= bound.getY()
+					&& (getY() + getHeight()) <= (bound.getY() + bound
+							.getHeight())) { // Completely in bound.
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public void accept(ComponentVisitor cv) {
+		cv.visit(this);
 	}
 
 	// ====================================================
@@ -482,13 +638,12 @@ public abstract class Element<E extends Element> implements Serializable {
 	 * 
 	 * @param lv
 	 */
-	protected void setOutput(LogicValue lv){
-		for (Outport op:ops){
+	protected void setOutput(LogicValue lv) {
+		for (Outport op : ops) {
 			op.setLogicValue(lv);
 		}
 	}
-	
-	
+
 	/**
 	 * 
 	 * @return The output value evaluated using the current input values.
@@ -501,7 +656,15 @@ public abstract class Element<E extends Element> implements Serializable {
 	public abstract void initializeProperty();
 
 	/**
+	 * 
+	 * @param port
+	 * @return
+	 */
+	public abstract Point getPortPosition(Port port);
+
+	/**
 	 * Visitor's pattern.
+	 * 
 	 * @param ev
 	 */
 	public abstract void visit(ElementVisitor ev);

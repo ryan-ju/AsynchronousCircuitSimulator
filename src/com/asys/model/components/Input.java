@@ -56,7 +56,13 @@ public class Input extends Element<Input>{
 	}
 
 	@Override
-	public Input clone() {
+	public Input copy() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public GroupElement getParent() {
 		// TODO Auto-generated method stub
 		return null;
 	}

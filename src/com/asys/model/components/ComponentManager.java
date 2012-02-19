@@ -6,7 +6,7 @@ import java.util.List;
 import com.asys.constants.LogicElement;
 
 
-public class ComponentManager implements Serializable{
+public class ComponentManager implements ElementOverlappingDetector{
 
 	/**
 	 * 
@@ -94,5 +94,21 @@ public class ComponentManager implements Serializable{
 	public SelectionManager getSelectionManager(){
 		// TODO
 		return null;
+	}
+
+	//====================================================
+	// ElementOverlappingDetector
+	//====================================================
+	
+	@Override
+	public boolean overlap(GroupElement ge) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean overlap(Element elt) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

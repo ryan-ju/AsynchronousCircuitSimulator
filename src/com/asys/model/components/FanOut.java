@@ -69,7 +69,12 @@ public class FanOut extends Element<FanOut> {
 		
 	}
 	@Override
-	public FanOut clone() {
+	public FanOut copy() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public GroupElement getParent() {
 		// TODO Auto-generated method stub
 		return null;
 	}

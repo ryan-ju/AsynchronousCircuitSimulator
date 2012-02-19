@@ -9,6 +9,9 @@ import java.io.Serializable;
  *
  *
  */
-public interface UnredoableCommand extends Serializable{
+public interface DoOnceCommand extends Serializable{
+	/**
+	 * 
+	 */
 	public void run();
 }

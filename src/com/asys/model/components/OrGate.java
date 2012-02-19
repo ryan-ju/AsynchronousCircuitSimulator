@@ -54,7 +54,13 @@ public class OrGate extends Element<OrGate>{
 	}
 
 	@Override
-	public OrGate clone() {
+	public OrGate copy() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public GroupElement getParent() {
 		// TODO Auto-generated method stub
 		return null;
 	}

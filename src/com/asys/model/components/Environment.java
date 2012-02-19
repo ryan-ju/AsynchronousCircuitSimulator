@@ -50,7 +50,13 @@ public class Environment extends Element<Environment>{
 	}
 
 	@Override
-	public Environment clone() {
+	public Environment copy() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public GroupElement getParent() {
 		// TODO Auto-generated method stub
 		return null;
 	}

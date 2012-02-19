@@ -3,6 +3,7 @@
  */
 package com.asys.model.components;
 
+import com.asys.constants.Direction;
 import com.asys.constants.LogicValue;
 
 /**
@@ -22,8 +23,13 @@ public class Outport extends Port{
 		this.value = value;
 	}
 
-	public Outport clone() {
+	public Outport copy() {
 		// TODO
 		return null;
+	}
+
+	@Override
+	public Direction getOrientation() {
+		return getParent().getOrientation();
 	}
 }

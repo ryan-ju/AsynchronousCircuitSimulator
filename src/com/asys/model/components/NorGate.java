@@ -56,7 +56,13 @@ public class NorGate extends Element<NorGate>{
 	}
 
 	@Override
-	public NorGate clone() {
+	public NorGate copy() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public GroupElement getParent() {
 		// TODO Auto-generated method stub
 		return null;
 	}
